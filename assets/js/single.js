@@ -1,4 +1,5 @@
 var issueContainerEl = document.querySelector("#issues-container");
+var limitWarningEl = document.querySelector("#limit-warning");
 
 // parameter is coming from homepage.js?
 var getRepoIssues = function (repo) {
@@ -10,6 +11,11 @@ var getRepoIssues = function (repo) {
          response.json().then(function (data) {
             // Pass response data to DOM function
             displayIssues(data);
+
+            // Check if API has paginated issues (a.k.a 'more than 30')
+            if (response.headers.get("Link")) {
+               displayWarning(repo);
+            }
          });
       } else {
          // When request did not find anything
@@ -57,4 +63,18 @@ var displayIssues = function (issues) {
    }
 };
 
-getRepoIssues("joseepina/bc-project-01");
+// Display warning in DOM to indicate if repo has more than 30 issues
+var displayWarning = function (repo) {
+   // Add text to warning container
+   limitWarningEl.textContent = "To see more than 30 issues, visit ";
+
+   var linkEl = document.createElement("a");
+   linkEl.textContent = "See More Issues on GitHub.com";
+   linkEl.setAttribute("href", "https://github.com/" + repo + "/issues");
+   linkEl.setAttribute("target", "_blank");
+
+   // Append to warning container
+   limitWarningEl.appendChild(linkEl);
+};
+
+getRepoIssues("facebook/react");
