@@ -4,6 +4,7 @@ var userFormEl = document.querySelector("#user-form");
 var nameInputEl = document.querySelector("#username");
 var repoContainterEL = document.querySelector("#repos-container");
 var repoSearchTerm = document.querySelector("#repo-search-term");
+var languageButtonsEl = document.querySelector("#language-buttons");
 
 var formSubmitHandler = function (event) {
    event.preventDefault(); // To disable <button> "submit/refresh page" behaviour
@@ -32,12 +33,14 @@ var getUserRepos = function (user) {
       .then(function (response) {
          // Request was successful
          if (response.ok) {
+            // console.log(response);
             // .ok is a read-only property of the Response interface
             response.json().then(function (data) {
+               // console.log(data);
                displayRepos(data, user);
             });
          } else {
-            alert("Error: GitHub User Not Found");
+            alert("Error: " + response.statusText); // replacing old alert saying "GitHub User Not Found"
          }
       })
       .catch(function (error) {
@@ -45,6 +48,23 @@ var getUserRepos = function (user) {
          // of the '.then()' method
          window.alert("Unable to connect to GitHub");
       });
+};
+
+// function to display the 'top' feature repos
+var getFeaturedRepos = function (language) {
+   var apiUrl = "https://api.github.com/search/repositories?q=" + language + "+is:featured&sort=help-wanted-issues";
+
+   fetch(apiUrl).then(function (response) {
+      if (response.ok) {
+         // console.log(response);
+         response.json().then(function (data) {
+            console.log(data);
+            displayRepos(data.items, language);
+         });
+      } else {
+         window.alert("Error: GitHub User Not Found");
+      }
+   });
 };
 
 // function parameters come from function above (data, user)
@@ -55,6 +75,7 @@ var displayRepos = function (repos, searchTerm) {
    // If not, then send alert.
    if (repos.length === 0) {
       repoContainterEL.textContent = "No repositories found.";
+      return;
    }
 
    // Clear old content from previous search
@@ -71,7 +92,7 @@ var displayRepos = function (repos, searchTerm) {
       var repoEl = document.createElement("a");
       repoEl.classList = "list-item flex-row justify-space-between align-center";
       repoEl.setAttribute("href", "./single-repo.html?repo=" + repoName);
-      
+
       // Create a span elements to hold repository name
       var titleEl = document.createElement("span");
       titleEl.textContent = repoName;
@@ -103,7 +124,18 @@ var displayRepos = function (repos, searchTerm) {
    console.log(searchTerm);
 };
 
+var buttonClickHandler = function (event) {
+   var language = event.target.getAttribute("data-language");
+   console.log(language);
+
+   if (language) {
+      getFeaturedRepos(language);
+
+      // Clear any remaining text from the repo container.
+      repoContainterEL.textContent = "";
+   }
+};
+
 // run formSubmit function on "click submit"
 userFormEl.addEventListener("submit", formSubmitHandler);
-
-console.log("outside");
+languageButtonsEl.addEventListener("click", buttonClickHandler);

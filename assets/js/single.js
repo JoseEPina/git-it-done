@@ -27,35 +27,32 @@ var getRepoIssues = function (repo) {
 };
 
 // F
-var getRepoName = function ()
-{
+var getRepoName = function () {
    // Retrieve Repo name from url Query String
    var queryString = document.location.search;
    var repoName = queryString.split("=")[1];
 
-   if (repoName)
-   {
+   if (repoName) {
       // Display Repo name on the page
       repoNameEl.textContent = repoName;
       console.log(repoName);
+      
       getRepoIssues(repoName);
-   } else
-   {
+   } else {
       // If no repo was given by user, redirect them to the homepage
       document.location.replace("./index.html");
    }
-
-   repoNameEl.textContent = repoName;
+   // repoNameEl.textContent = repoName;
 };
 
 // Build GitHub Issue data into DOM Elements here
 var displayIssues = function (issues) {
    // Check if Repo has ANY open issues
    if (issues.length === 0) {
-      issueContainerEl.textContent = "This repo has no open issues";
+      issueContainerEl.textContent = "This repo has no open issues.";
       return;
    }
-
+   // Loop over given issues
    for (var i = 0; i < issues.length; i++) {
       // Create an <anchor> link element to take users to the GitHub issue
       var issueEl = document.createElement("a");
